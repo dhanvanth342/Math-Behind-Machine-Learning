@@ -1,0 +1,8 @@
+numpy
+pytest
+ipython
+scipy
+matplotlib
+pandas
+tqdm
+scikit-learn
