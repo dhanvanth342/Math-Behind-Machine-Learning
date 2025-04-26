@@ -1,0 +1,133 @@
+---
+title: "hw6_math564"
+author: "V. V. Dhanvanthar M. [A20543395]"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Homework 6
+
+## Problem 1
+
+## a
+```{r}
+library("ISLR2")
+?Carseats
+
+y <- Carseats$Sales
+x1 <- ifelse(Carseats$Urban == 'Yes',1,0)
+x2 <- ifelse(Carseats$US == 'Yes', 1,0)
+x3 <- Carseats$Price
+
+model1 <- lm(y~x1+x2+x3)
+summary(model1)
+
+```
+
+## b 
+
+From summary,overall pvalue is 2.2e-16, explains the model is significant overall, r-squared = 0.2393, which means the input variables are able to
+explain 23.93 % variability in target variable [sales].
+r-squared < adjusted r-sqaured, which means there is effect of penalty term in adjusted r-squared due to considering very few input features. 
+
+## c
+From the summary, we can observe the p values of the three input features.
+1. Urban --> p-value = 0.936 >> 0.05. So unable to reject null hypothesis, which means there is no relationship between Urban and sales [Not significant]
+2. US --> P-value = 4.86e-06 << 0.05. So, it Rejects null hypothesis [Significant].
+3. Price --> P-value = 2e-16 <<< 0.05. So, it Rejects null hypothesis [Significant].
+ 
+
+## d 
+Since Urban is not significant, in feature selection, i am omitting Urban
+and considering only US and Price.
+
+```{r}
+y <- Carseats$Sales
+x1 <- ifelse(Carseats$US == 'Yes',1,0)
+x2 <- Carseats$Price
+model2 <- lm(y~x1+x2)
+summary(model2)
+```
+## e 
+RSE [Model 2] = 2.469 < RSE [Model 1] = 2.472
+Adjusted R^2 {Model 2} = 0.2354 > Adjusted R^2 [Model 1] = 0.2335
+
+Model 2 has lesser RSE compared Model 1 and model 2 is able to explain
+variability of y variable better than model 1 [from adjusted r^2]
+So model 2 performed better than model 1.
+Still since the Adjusted R^2 is only 0.2335, it is necessary to inlcude more
+variables for better model fit. 
+
+## Problem 2
+
+```{r}
+library(datasets)
+data(swiss)
+head(swiss)
+
+```
+```{r}
+hist(swiss$Catholic)
+```
+
+```{r}
+library(dplyr)
+#adding a column for 1 or 0 depending on Catholic %
+swiss = mutate(swiss, CatholicBin = 1*(Catholic>50))
+head(swiss)
+
+```
+
+```{r}
+x1 <- swiss$Agriculture
+y <- swiss$Fertility
+plot(x1,y)
+
+model1 <- lm(y ~ x1 + factor(CatholicBin), data=swiss)
+summary(model1)$coef
+```
+
+Lets evaluate the model based on the metrics:
+a. P-value: Both the input features have P-value > 0.05, explains both the variables are not significant and unable to reject the Null hypothesis.
+This means, there could be no direct relationship between the target variable and input features.
+
+The coefficient of X2(Catholic) = 7.8843. This means, if we keep x1 constant, 
+the value of Y increase by 7.883 when Catholic is one, else equals to y= beta1*x1 + beta0. 
+Similarly coefficient of X1 0 0.124. Keeping x2 at constant, the value of Y increases by 0.124 when x1 increase by a unit.
+
+
+## Problem 4
+
+```{r}
+Catdata <- read.csv("D:/3rd_sem/Math564/Cat1.csv", header = TRUE, sep=",")
+plot(Catdata$x1, Catdata$y)
+
+#create indicator variable
+x2 <- ifelse(Catdata$group =="A", 1,0)
+x3 <- ifelse(Catdata$group =="B", 1,0)
+x4 <- ifelse(Catdata$group =="C", 1,0)
+df_new <- data.frame(toolwear = Catdata$y, speed = Catdata$x1, x2, x3, x4)
+df_new
+model1 <- lm(toolwear~speed+factor(x2)+factor(x3)+factor(x4), data=df_new)
+summary(model1)
+summary(model1)$coef
+```
+
+From the coefficients of X2,X3,X4 we can tell:
+1.On average there is 2.113, 1.454, 0.291 increase in tool wear for unit increase in A, B, C respectively.
+2. This means, Tool A has higher impact individually on tool wear while tool c has the least impact.
+
+Coming to P-values, none of the values are less than (0.05) which indicates none of them are significant and failed to reject null hypothesis.
+
+R-squared (0.07094): This indicates that only 7% of the variability in tool wear is explained by the model (speed and tool model), which suggests that the model does not provide a good fit for the data. 
+

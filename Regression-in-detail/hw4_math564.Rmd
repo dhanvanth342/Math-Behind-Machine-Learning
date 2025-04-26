@@ -1,0 +1,140 @@
+---
+title: "Hw4_math564"
+author: "V. V. Dhanvanthar M. [A20543395]"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Question 1
+
+```{r}
+library("tidyverse")
+#View(mtcars)
+?mtcars
+my_data <-mtcars %>%
+  select(mpg, cyl, disp, hp, wt)
+model1<- lm(mpg~cyl+disp+hp+wt, data = my_data)
+summary(model1)
+
+```
+## 1a)
+In feature selection, p-value is an important metric to follow.
+In model1 case, wt has the least p-value (0.000759), which indicates it is highly significant and it rejects the null hypothesis(p-value less than 0.05 cutoff). This means, there is some relation between wt and target variable. Hence we definitely consider this feature for next run of model. The least p-value is obtained for disp(0.3313) which explains the feature is not significant and can be neglected. 
+So, for model 2 we consider cyl, hp, wt features.
+
+```{r}
+my_data2 <-mtcars %>%
+  select(mpg, cyl, hp, wt)
+model2<- lm(mpg~cyl+hp+wt, data = my_data2)
+summary(model2)
+```
+## 1b)
+Looking into p-values in model2 case,
+we observe wt has the least p-value(0.000199) explaining its significance among the features selected and hp having the highest(0.140015). So we drop this for next model fitting.
+
+```{r}
+my_data3 <-mtcars %>%
+  select(mpg, cyl, wt)
+model3<- lm(mpg~cyl+wt, data = my_data3)
+summary(model3)
+```
+## 1c)
+In this model considering the cutoff for p-value as 0.05, we obtain both the features are significant since both have p-values less than 0.05. 
+
+## 1d)
+We know that R-squared gives us understanding on how well the model is fitting the data and explains the variability in dependent variable. 
+In this case, even with 2 features, the R-squared is 0.8302 which explains that both the selected features are highly correlated with fuel efficiency(mpg),
+We can infer that, Heavier cars and cars with more cylinders tend to have lower fuel efficiency, so these two predictors can explain a substantial portion of the variability in mpg. 
+
+## Question 2
+
+## 2a)
+
+```{r}
+library("ISLR2")
+?Carseats
+my_data <-Carseats %>%
+  select(Sales, Advertising, Price)
+model1<- lm(Sales~Advertising+Price, data = my_data)
+summary(model1)
+```
+
+## 2b)
+We can reject null hypothesis on both the features after looking at their p-values. That is, with cutoff of p-value as 0.05, we observe both selected features are proven to be significant implying that they have a relation with the target feature. 
+
+## 2c)
+Even though the p-values are proving the two features are significant, the R-squared metric gives a different view to the problem. The R-squared value is 0.28, which explains these 2 features are only capable of explaining 28% of variability in sales(target variable). Which means around 71.8% of variability in sales is not explained by advertising and price. 
+
+## Question 3
+
+```{r}
+#load the txt file and named it as data1
+data1 <- read.table("MMass.txt", header = FALSE)
+
+#showing the first 6 data points
+head(data1)
+num_samples <- nrow(data1)
+print(num_samples)
+#Rename variables
+x <- data1$V2
+y <- data1$V1
+
+#plotting data
+plot(x,y)
+
+                
+```
+## 3a)
+
+```{r}
+#fitting linear regression
+model <- lm(y~x)
+summary(model)
+```
+
+```{r}
+plot(x, y)
+abline(model)
+
+```
+
+
+## 3b)
+
+The point estimate of the average change in muscle mass for women differing in age by one year is represented by the slope coefficient of the regression model
+In the summary of model, we can see the x coefficient(estimated slope) is -1.1900. The negative sign indicates the x and y negatively correlated. This means that for every additional year of age, the muscle mass decreases by approximately 1.19 units on average. Thus, the point estimate of the average change in muscle mass for women differing in age by one year is -1.19 units
+
+## 3c) 
+
+We know point estimate of sigma square (constant variance of E)  is the sample variance of constant variance.
+We have RSE = 8.173 = sqrt(RSS/n-p)
+n-p = degree of freedom = 58.
+
+RSS = (8.173) ^ 2 x (n-p)
+RSS = 66.79 x (n-p) ... (1)
+
+we know point estimate of sigma square = RSS/(n-p) ... (2)
+
+substitute equation 1 in 2.
+
+Point estimate of constant variance = 66.79. 
+
+## 3d) 
+
+R-squared = 0.7501
+This implies approximately 75% of variance in muscle mass is explained by age. The higher r-squared value, the better the model fit is. 
+P-value = 2.2e-16 <<< 0.05
+This indicates the age is a significant feature in predicting the muscle mass. 
+Both these metrics suggests that linear regression model seem to provide a good fit for the data. 
+
+The plot and the cofficient of x(negative) both indicate that muscle mass decreases with increase in age. 
